@@ -1,0 +1,5 @@
+D:\Projects\SILANIS\Vishva.CustomJqGrid\Vishva.CustomJqGrid\bin\Vishva.CustomJqGrid.dll.config
+D:\Projects\SILANIS\Vishva.CustomJqGrid\Vishva.CustomJqGrid\bin\Vishva.CustomJqGrid.dll
+D:\Projects\SILANIS\Vishva.CustomJqGrid\Vishva.CustomJqGrid\bin\Vishva.CustomJqGrid.pdb
+D:\Projects\SILANIS\Vishva.CustomJqGrid\Vishva.CustomJqGrid\obj\Debug\Vishva.CustomJqGrid.dll
+D:\Projects\SILANIS\Vishva.CustomJqGrid\Vishva.CustomJqGrid\obj\Debug\Vishva.CustomJqGrid.pdb

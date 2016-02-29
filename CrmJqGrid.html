@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="scripts/jquery_1.9.0.min.js" type="text/javascript"></script>
+    <script src="scripts/jquery.jqGrid.js" type="text/javascript"></script>
+    <script src="scripts/grid.locale_en.js" type="text/javascript"></script>
+    <script src="scripts/json2.js" type="text/javascript"></script>
+    <link href="css/ui.jqgrid_custom.css" rel="stylesheet" />
+    <script src="scripts/XrmServiceToolkit.min.js" type="text/javascript"></script>
+    <title></title>
+    <style>
+        body {
+            border: 0px;
+            margin: 0px;
+            font-family: Segoe UI,Tahoma,Arial;
+            font-size: 11px;
+        }
+
+        label {
+            padding: 0px 0px 10px 0px;
+        }
+
+        #ol_left_pane {
+            list-style: none;
+        }
+
+            #ol_left_pane li:hover > a,
+            #ol_left_pane a:focus {
+                background: #f9f9f9; /* Show a solid color for older browsers */
+                background: -moz-linear-gradient(#f9f9f9, #e5e5e5);
+                background: -o-linear-gradient(#f9f9f9, #e5e5e5);
+                background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f9f9f9), to(#e5e5e5)); /* Older webkit syntax */
+                background: -webkit-linear-gradient(#f9f9f9, #e5e5e5);
+                color: #373737;
+            }
+
+            #ol_left_pane a {
+                border-bottom: 2px solid #fff;
+                display: block;
+                line-height: 2.333em;
+                text-decoration: none;
+            }
+
+        .pane-highlight {
+            border: 0px solid #e5e5e5;
+            background-color: #e5e5e5;
+        }
+
+        .treenav_body {
+            height: 0px;
+            width: 220px;
+            margin-top: 0px;
+            font-family: Segoe\000020UI,Tahoma,Arial;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var mydata = [{
+            Sno: "1",
+            Name: "Mortgage",
+            Owner: "Debu,John"
+        }, {
+            Sno: "2",
+            Name: "Healthcare",
+            Owner: "Mike, Hussy"
+        }, {
+            Sno: "3",
+            Name: "Land Bill",
+            Owner: "Devid, Boon"
+        }, {
+            Sno: "4",
+            Name: "Personal Loan",
+            Owner: "Rakesh, Sharma"
+        },
+         {
+             Sno: "5",
+             Name: "Finance",
+             Owner: "Vishva, Achary"
+         }
+        , {
+            Sno: "6",
+            Name: "Hotel Booking",
+            Owner: "Antony, Sebastian"
+        }];
+
+        var sharePointdata = [{
+            Sno: "1",
+            Name: "Sharepoint 1",
+            Owner: "Debu,John"
+        }, {
+            Sno: "2",
+            Name: "Sharepoint 2",
+            Owner: "Mike, Hussy"
+        }, {
+            Sno: "3",
+            Name: "Sharepoint 3",
+            Owner: "Devid, Boon"
+        }];
+        var selectedDocuments = [];
+
+        $(function () {
+            highlightSelectedLink();
+            //bindSelectedDocumentGrid(selectedDocuments);
+            $("#documentGrid").jqGrid({
+                data: mydata,
+                datatype: "local",
+                colNames: ["Sno", "Action", "Name", "Owner"],
+                colModel: [
+                    { name: 'Sno', index: 'Sno', width: 1, hidden: true, key: true },
+                    { name: 'add', search: false, align: "center", index: 'Sno', width: 45, sortable: false, formatter: addDocumentButton },
+                    { name: "Name", width: 250 },
+                    { name: "Owner", width: 150, align: "left" }
+                ],
+                pager: "#pager",
+                multiselect:true,
+                rowNum: 7,
+                rowList: [1, 2, 3],
+                sortname: "Sno",
+                sortorder: "desc",
+                viewrecords: true,
+                gridview: true,
+                autoencode: true,
+                caption: "Select Related Entity Documents",
+                hidegrid: true,
+                shrinkToFit: true
+            });
+
+        });
+
+        function addDocuments() {
+            $("#documentGrid").find('input[type=checkbox]').each(function () {
+                if ($(this).is(':checked')) {
+                    var name = $(this)[0].parentElement.nextSibling.nextSibling.nextSibling.innerText;
+                    var id = $(this)[0].parentElement.nextSibling.innerText;
+                    alert(name);
+                    var colid = $(this).parents('tr').attr('id');
+                }
+            });
+        }
+
+        function highlightSelectedLink() {
+            $('ol#ol_left_pane li a').click(function () {
+                $('ol#ol_left_pane li a').css('font-weight', 'normal');
+                $('ol#ol_left_pane li a').removeClass('pane-highlight');
+                $(this).css('font-weight', 'bold');
+                $(this).addClass('pane-highlight');
+            });
+        }
+        function addDocumentButton(cellValue, options, rowdata, action) {
+            return "<a href='javascript:addSelectedDocument(\"" + rowdata.Name + "\",\"" + rowdata.Sno + "\")' class='ui-icon ui-icon-plusthick' align: 'center' ></a>";
+        }
+
+        function addSelectedDocument(docName, docId) {
+            var x = selectedDocuments;
+            selectedDocuments.push({
+                "DocumentId": docId,
+                "DocumentName": docName
+            });
+            bindSelectedDocumentGrid(selectedDocuments);
+        }
+
+        function removeDocumentById(array, documentId) {
+            for (var index = 0; index < array.length; index++) {
+                var document = array[index];
+                if (document.DocumentId == documentId) {
+                    array.splice(index, 1);
+                }
+            }
+        }
+
+        function bindSelectedDocumentGrid(selectedDocuments) {
+            $("#selectedDocumentGrid").GridUnload();
+            $("#selectedDocumentGrid").jqGrid({
+                data: selectedDocuments,
+                datatype: "local",
+                colNames: ["Name", "Action"],
+                colModel: [
+                    { name: "DocumentName", width: 350, },
+                    { name: 'Delete', search: false, align: "center", index: 'DocumentId', width: 45, sortable: false, formatter: deleteDocumentButton }
+                ],
+                pager: "#spPager",
+                rowNum: 7,
+                rowList: [1, 2, 3],
+                sortname: "DocumentId",
+                sortorder: "desc",
+                viewrecords: true,
+                gridview: true,
+                autoencode: true,
+                caption: "Selected Documents",
+                hidegrid: true,
+                shrinkToFit: false
+            });
+        }
+
+        function deleteDocumentButton(cellValue, options, rowdata, action) {
+            return "<a href='javascript:deleteDocument(" + rowdata.DocumentId + ")' class='ui-icon ui-icon-trash'></a>";
+        }
+
+        function deleteDocument(docId) {
+            removeDocumentById(selectedDocuments, docId);
+            bindSelectedDocumentGrid(selectedDocuments);
+        }
+        function contactOnload() {
+            var contactFetchXML = "<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>" +
+            "  <entity name='contact'>" +
+            "    <attribute name='fullname' />" +
+            "    <attribute name='telephone1' />" +
+            "    <attribute name='contactid' />" +
+            "    <order attribute='fullname' descending='false' />" +
+            "    <filter type='and'>" +
+            "      <condition attribute='statecode' operator='eq' value='0' />" +
+            "    </filter>" +
+            "  </entity>" +
+            "</fetch>";
+            var contactRecords = XrmServiceToolkit.Soap.Fetch(contactFetchXML);
+            if (contactRecords.length > 0) {
+                if (contactRecords[0].attributes.telephone1 != undefined)
+                    alert(contactRecords[0].attributes.telephone1.value);
+            }
+        }
+
+
+
+    </script>
+
+</head>
+<body>
+    <div>
+        <div>
+            <div class="treenav_body">
+                <div id="div_nav_components" class="ui-widget-content">
+                 
+                </div>
+            </div>
+        </div>
+        <div style="margin-left: 250px; margin-top: 0px;">
+            <table>
+                <tr>
+                    <td>
+                        Type : <select style="font-size:11px">
+                            <option>
+                                ---Select Docuemtns-----
+                            </option>
+                            <option>
+                                All Documents
+                            </option>
+                            <option>
+                                Select Related Entity Documents
+                            </option>
+                            <option>
+                               Select Unrelated Entity Documents
+                            </option>
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <table id="documentGrid"></table>
+                        <div id="pager" class='scroll'></div>
+                    </td>
+                    <td></td>
+                    <td>
+                        <div style="border: solid 1px; border-color: #D6D6D6">
+                            <table id="selectedDocumentGrid"></table>
+                            <div id="spPager" class='scroll'></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="button" value="Add Document" onclick="addDocument()" /></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
